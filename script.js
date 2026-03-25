@@ -1,29 +1,36 @@
-const delay = (ms) =>
-  new Promise((resolve) => setTimeout(() => resolve(ms), ms));
+function delayedPromise(value, delay) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(value), delay);
+  });
+}
 
-const logger1 = (time) => console.log(`Resolved after ${time}ms`);
-
-delay(2000).then(logger1);
-delay(1000).then(logger1);
-delay(1500).then(logger1);
-
-const users = [
-  { name: "Mango", active: true },
-  { name: "Poly", active: false },
-  { name: "Ajax", active: true },
-  { name: "Lux", active: false },
+const promises = [
+  delayedPromise("A", 1000),
+  delayedPromise("B", 2000),
+  delayedPromise("C", 1500),
+  delayedPromise("D", 3000),
+  delayedPromise("E", 2500),
 ];
 
-const toggleUserState = (allUsers, userName) => {
+Promise.all(promises).then((results) => {
+  console.log("All:", results);
+});
+
+function randomDelay(value) {
+  const delay = Math.floor(Math.random() * 4000) + 1000;
   return new Promise((resolve) => {
-    const updatedUsers = allUsers.map((user) =>
-      user.name === userName ? { ...user, active: !user.active } : user,
-    );
-    resolve(updatedUsers);
+    setTimeout(() => resolve(value), delay);
   });
-};
+}
 
-const logger2 = (updatedUsers) => console.table(updatedUsers);
+const racePromises = [
+  randomDelay("A"),
+  randomDelay("B"),
+  randomDelay("C"),
+  randomDelay("D"),
+  randomDelay("E"),
+];
 
-toggleUserState(users, "Mango").then(logger2);
-toggleUserState(users, "Lux").then(logger2);
+Promise.race(racePromises).then((result) => {
+  console.log("Fastest:", result);
+});
